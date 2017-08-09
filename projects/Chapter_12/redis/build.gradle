@@ -1,0 +1,40 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile("org.springframework:spring-context:4.0.6.RELEASE")
+    compile("org.springframework.data:spring-data-redis:1.3.2.RELEASE")
+    compile("com.fasterxml.jackson.core:jackson-databind:2.4.1.3")
+    compile("redis.clients:jedis:2.5.2")
+    testCompile("junit:junit-dep:4.11")
+    testCompile("org.springframework:spring-test:4.0.6.RELEASE")
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.0'
+}
+
+apply plugin: 'maven'
+
+group = 'com.company.root'
+// artifactId is taken by default, from folder name
+version = '0.0.1-SNAPSHOT'
+
+task writeNewPom << {
+    pom {
+        project {
+            inceptionYear '2014'
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    distribution 'repo'
+                }
+            }
+        }
+    }.writeTo("pom.xml")
+}
