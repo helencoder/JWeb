@@ -9,9 +9,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
  */
 
 @Controller     // 声明为一个控制器
+@RequestMapping({"/", "/homepage"})    // 将控制器映射到“/”,“/homepage”
 public class HomeController {
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)    // 处理对“/”的GET请求
+    @RequestMapping(method = RequestMethod.GET)    // 处理GET请求
     public String home() {
         return "home";  // 视图名为home
     }
