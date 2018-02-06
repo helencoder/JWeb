@@ -18,7 +18,7 @@ import java.util.Set;
  * Created by helencoder on 2017/9/20.
  */
 
-@Component("filterController")
+@Component("shieldController")
 @Controller
 @RequestMapping("/shield")
 public class HomeController {
