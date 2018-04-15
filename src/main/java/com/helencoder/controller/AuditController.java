@@ -58,7 +58,7 @@ public class AuditController {
         MessageDao messageDao = new MessageDao();
         if (sb.toString().length() > 0) {
             messageDao.setCode("100000");
-            messageDao.setData("0");
+            messageDao.setData("1");
             messageDao.setMsg("文本包含敏感词： " + sb.toString());
         } else {
             // 文本审核
