@@ -27,8 +27,6 @@ public class HomeController {
             model.addAttribute("msg", "待检测文本为：" + text);
         }
 
-
-
         return "keywords";
     }
 
@@ -39,15 +37,17 @@ public class HomeController {
         if (text.isEmpty()) {
             model.addAttribute("msg", "请输入待检测文本");
         } else {
-            model.addAttribute("msg", "待检测文本为：" + text.substring(0,10) + "...");
-            // 中间逻辑处理
-            // 特定敏感词检测
+            model.addAttribute("msg", "待检测文本为：" + text);
 
             TextrankOptimization textrankOptimization = new TextrankOptimization();
+            System.out.println(text);
             textrankOptimization.analyze(text, 5);
 
             List<String> keywordsList = textrankOptimization.getKeywordsList(10);
-            model.addAttribute("keywordWords", keywordsList);
+            for (String word : keywordsList) {
+                System.out.println(word);
+            }
+            model.addAttribute("keywords", keywordsList);
         }
         long endTime = System.currentTimeMillis();
         model.addAttribute("time", "查询用时：" + (endTime - startTime) + "ms");
