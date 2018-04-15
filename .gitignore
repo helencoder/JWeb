@@ -23,6 +23,8 @@ hs_err_pid*
 
 # optional
 .idea/
+.DS_Store
+projects/
 target/
 data/
 conf/
