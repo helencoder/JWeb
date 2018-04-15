@@ -1,4 +1,4 @@
-package com.helencoder.util;
+package com.helencoder.domain.utils;
 
 import java.io.*;
 import java.net.MalformedURLException;
@@ -8,11 +8,12 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- * 文件操作类
+ * 文件相关操作类
  *
- * Created by helencoder on 2017/8/16.
+ * Created by zhenghailun on 2017/6/18.
  */
-public class FileUtil {
+public class FileIO {
+
     // read file from url
     public static void readDataFromUrl(String urlPath) {
         try {
@@ -109,9 +110,10 @@ public class FileUtil {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filepath)));
             for (String line = br.readLine(); line != null; line = br.readLine()) {
-                //System.out.println(line);
                 // handle
-                fileDataList.add(line);
+                if (line.length() != 0) {
+                    fileDataList.add(line);
+                }
             }
             br.close();
         } catch (IOException ex) {
@@ -149,4 +151,5 @@ public class FileUtil {
             ex.printStackTrace();
         }
     }
+
 }
