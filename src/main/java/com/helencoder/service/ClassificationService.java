@@ -1,6 +1,7 @@
 package com.helencoder.service;
 
 import com.helencoder.service.deeplearning.DeepClassifier;
+import com.helencoder.service.deeplearning.ShieldClassifier;
 import com.helencoder.service.machinelearning.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +29,7 @@ public class ClassificationService implements Serializable {
     @Autowired
     private SVMClassifier svmClassifier;
     @Autowired
-    private DeepClassifier deepClassifier;
+    private ShieldClassifier shieldClassifier;
 
     @Value("${model.method}")
     private String modelMethod;
@@ -52,7 +53,7 @@ public class ClassificationService implements Serializable {
             case "SVM":
                 return svmClassifier.run(content);
             case "Deep":
-                return deepClassifier.run(content);
+                return shieldClassifier.run(content);
             default:
                 return naiveBayesClassifier.run(content);
         }

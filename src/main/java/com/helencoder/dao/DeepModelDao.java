@@ -25,9 +25,13 @@ public class DeepModelDao {
     public static final String MODEL_CACHE_KEY = "\"deepNet\"";
     public static final String VECTOR_CACHE_NAME = "vectorCache";
     public static final String VECTOR_CACHE_KEY = "\"wordVector\"";
+    public static final String SHIELD_MODEL_CACHE_NAME = "shieldModelCache";
+    public static final String SHIELD_MODEL_CACHE_KEY = "\"deepShieldNet\"";
+    public static final String SHIELD_VECTOR_CACHE_NAME = "shieldVectorCache";
+    public static final String SHIELD_VECTOR_CACHE_KEY = "\"shieldWordVector\"";
 
     /**
-     * 获取深度模型
+     * 获取深度模型(情感识别)
      */
     @Cacheable(value = MODEL_CACHE_NAME, key = MODEL_CACHE_KEY)
     public MultiLayerNetwork getNet() throws Exception {
@@ -37,12 +41,32 @@ public class DeepModelDao {
     }
 
     /**
-     * 获取词向量模型
+     * 获取词向量模型(情感识别)
      */
     @Cacheable(value = VECTOR_CACHE_NAME, key = VECTOR_CACHE_KEY)
     public WordVectors getWordVectors() {
         System.out.println("进入词向量，执行方法！");
         String WORD_VECTORS_PATH = WebConstants.getClassPath() + "/static/data/deep/emotion/dengta.model";
+        return word2VecModel.load(WORD_VECTORS_PATH);
+    }
+
+    /**
+     * 获取深度模型(内容审核)
+     */
+    @Cacheable(value = SHIELD_MODEL_CACHE_NAME, key = SHIELD_MODEL_CACHE_KEY)
+    public MultiLayerNetwork getShieldNet() throws Exception {
+        System.out.println("进入深度模型，执行方法！");
+        String modelPath = WebConstants.getClassPath() + "/static/data/deep/shield/ShieldModel.net";
+        return ModelSerializer.restoreMultiLayerNetwork(modelPath);
+    }
+
+    /**
+     * 获取词向量模型(内容审核)
+     */
+    @Cacheable(value = SHIELD_VECTOR_CACHE_NAME, key = SHIELD_VECTOR_CACHE_KEY)
+    public WordVectors getShieldWordVectors() {
+        System.out.println("进入词向量，执行方法！");
+        String WORD_VECTORS_PATH = WebConstants.getClassPath() + "/static/data/deep/shield/shieldWordVector.model";
         return word2VecModel.load(WORD_VECTORS_PATH);
     }
 

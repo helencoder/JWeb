@@ -37,11 +37,6 @@ public class AuditController {
         String content = map.get("content").toString();
         String source = map.get("source").toString();
 
-        String method = "LogisticRegression";
-        if (source.equals("emotion")) {
-            method = "Deep";
-        }
-
         // 分词
         String segContent = segmentationService.segWords(content, " ");
 
@@ -61,12 +56,23 @@ public class AuditController {
             messageDao.setData("1");
             messageDao.setMsg("文本包含敏感词： " + sb.toString());
         } else {
-            // 文本审核
-            String res = classificationService.run(segContent, method);
+            // 文本审核(机器学习、深度学习同时判断)
+            String mlRes = classificationService.run(segContent, "LogisticRegression");
+            String deepRes = classificationService.run(segContent, "Deep");
+            System.out.println("机器识别结果" + mlRes + "\t深度识别结果：" + deepRes);
             long endTime = System.currentTimeMillis();
             long time = endTime - startTime;
             String msg = "耗时：" + time + "ms";
-            System.out.println(res);
+
+            String res = "";
+            if (mlRes.equals("pos") && deepRes.equals("pos")) {
+                res = "pos";
+            } else if ((mlRes.equals("pos") && deepRes.equals("neg")) || (mlRes.equals("neg") && deepRes.equals("pos"))) {
+                res = "nor";
+            } else {
+                res = "neg";
+            }
+
             switch (res) {
                 case "pos":
                     messageDao.setData("0");
@@ -74,6 +80,7 @@ public class AuditController {
                 case "neg":
                     messageDao.setData("1");
                     break;
+                case "nor":
                 default:
                     messageDao.setData("2");
                     break;
