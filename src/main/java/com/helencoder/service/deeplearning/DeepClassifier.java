@@ -46,9 +46,7 @@ public class DeepClassifier {
     @Autowired
     private DeepModelDao deepModelDao;
 
-    //WordVectors wordVectors;
     TokenizerFactory tokenizerFactory;
-    //MultiLayerNetwork net;
 
     public String run(String content) throws Exception {
         // 检查模型文件是否存在
