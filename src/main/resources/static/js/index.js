@@ -69,7 +69,7 @@ function catchInputArea(){
             $("#submit").css("opacity", "0.3");
         }
         $("#neg").css("color", "#AAA");
-        $("#spt").css("color", "#AAA");
+        $("#pos").css("color", "#AAA");
         $("#nor").css("color", "#AAA");
         $("#feedback").css("display", "none");
     }
