@@ -58,21 +58,13 @@ public class SVMClassifier implements Serializable {
             // 进行模型存储(是否可置于异步来做)
             model.save(sparkSession.sparkContext(), modelPath);
         }
-
-        // 验证数据
-        JavaRDD<String> testRDD = sc.parallelize(Arrays.asList(content));
-        JavaRDD<String> predictRDD = testRDD.map(
-                new Function<String, String>() {
-                    @Override
-                    public String call(String s) throws Exception {
-                        return model.predict(tf.transform(Arrays.asList(s.split(" ")))) == 1.0 ? "neg" : "pos";
-                    }
-                }
-        );
-
-        // 结果反馈
-        List<String> resList = predictRDD.collect();
-        return resList.get(0);
+        
+        // 对于单一词的判断限制
+        if (Arrays.asList(content.split(" ")).size() < 2) {
+            return "pos";
+        } else {
+            return model.predict(tf.transform(Arrays.asList(content.split(" ")))) == 1.0 ? "neg" : "pos";
+        }
     }
 
 }
