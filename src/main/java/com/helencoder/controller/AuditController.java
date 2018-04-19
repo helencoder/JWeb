@@ -5,6 +5,7 @@ import com.helencoder.service.ClassificationService;
 import com.helencoder.service.FilterService;
 import com.helencoder.service.SegmentationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +22,9 @@ import java.util.Map;
 @Component("AuditController")
 @RestController
 public class AuditController {
+
+    @Autowired
+    private Environment env;
 
     @Autowired
     private ClassificationService classificationService;
@@ -62,7 +66,9 @@ public class AuditController {
             System.out.println("机器识别结果" + mlRes + "\t深度识别结果：" + deepRes);
             long endTime = System.currentTimeMillis();
             long time = endTime - startTime;
-            String msg = "耗时：" + time + "ms";
+            String msg = "耗时: " + time + "ms" + "\t"
+                    + "机器识别结果: " + getRes(mlRes) + "\t"
+                    + "深度识别结果: " + getRes(deepRes);
 
             String res = "";
             if (mlRes.equals("pos") && deepRes.equals("pos")) {
@@ -86,6 +92,7 @@ public class AuditController {
                     break;
             }
             messageDao.setCode("100000");
+
             messageDao.setMsg(msg);
         }
 
@@ -105,6 +112,23 @@ public class AuditController {
         messageDao.setMsg(msg);
 
         return messageDao;
+    }
+
+    private String getRes(String str) {
+        String label = "";
+        switch (str) {
+            case "nor":
+                label = "疑似";
+                break;
+            case "neg":
+                label = "违规";
+                break;
+            case "pos":
+            default:
+                label = "通过";
+                break;
+        }
+        return label;
     }
 
 }
