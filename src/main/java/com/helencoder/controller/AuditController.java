@@ -1,8 +1,12 @@
 package com.helencoder.controller;
 
+import com.helencoder.dao.DataBaseDao;
 import com.helencoder.dao.MessageDao;
+import com.helencoder.domain.entity.CommunityEventsVo;
+import com.helencoder.domain.entity.CommunityShieldRecordsVo;
 import com.helencoder.service.ClassificationService;
 import com.helencoder.service.FilterService;
+import com.helencoder.service.RecordService;
 import com.helencoder.service.SegmentationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -11,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.FileNotFoundException;
 import java.util.Map;
 
@@ -27,6 +32,9 @@ public class AuditController {
     private Environment env;
 
     @Autowired
+    private HttpServletRequest request;
+
+    @Autowired
     private ClassificationService classificationService;
 
     @Autowired
@@ -35,11 +43,22 @@ public class AuditController {
     @Autowired
     private FilterService filterService;
 
+    @Autowired
+    private RecordService recordService;
+
     @RequestMapping("/audit")
     public MessageDao audit(@RequestBody(required = true)Map<String, Object> map) throws Exception {
         long startTime = System.currentTimeMillis();
         String content = map.get("content").toString();
         String source = map.get("source").toString();
+        String requestIp = request.getRemoteAddr();
+
+        // 用户访问数据记录
+        CommunityEventsVo communityEventsVo = new CommunityEventsVo();
+        communityEventsVo.setUserId(requestIp);
+        communityEventsVo.setRequestData(content);
+        communityEventsVo.setRequestTime();
+        recordService.recordCommunityEvent(communityEventsVo);
 
         // 分词
         String segContent = segmentationService.segWords(content, " ");
@@ -62,18 +81,18 @@ public class AuditController {
         } else {
             // 文本审核(机器学习、深度学习同时判断)
             String mlRes = classificationService.run(segContent, "LogisticRegression");
-            String deepRes = classificationService.run(segContent, "Deep");
-            System.out.println("机器识别结果" + mlRes + "\t深度识别结果：" + deepRes);
+            String dlRes = classificationService.run(segContent, "Deep");
+            System.out.println("机器识别结果" + mlRes + "\t深度识别结果：" + dlRes);
             long endTime = System.currentTimeMillis();
             long time = endTime - startTime;
             String msg = "耗时: " + time + "ms" + "\t"
                     + "机器识别结果: " + getRes(mlRes) + "\t"
-                    + "深度识别结果: " + getRes(deepRes);
+                    + "深度识别结果: " + getRes(dlRes);
 
             String res = "";
-            if (mlRes.equals("pos") && deepRes.equals("pos")) {
+            if (mlRes.equals("pos") && dlRes.equals("pos")) {
                 res = "pos";
-            } else if ((mlRes.equals("pos") && deepRes.equals("neg")) || (mlRes.equals("neg") && deepRes.equals("pos"))) {
+            } else if ((mlRes.equals("pos") && dlRes.equals("neg")) || (mlRes.equals("neg") && dlRes.equals("pos"))) {
                 res = "nor";
             } else {
                 res = "neg";
@@ -92,8 +111,18 @@ public class AuditController {
                     break;
             }
             messageDao.setCode("100000");
-
             messageDao.setMsg(msg);
+
+            // 审核数据记录
+            CommunityShieldRecordsVo communityShieldRecordsVo = new CommunityShieldRecordsVo();
+            communityShieldRecordsVo.setData(content);
+            communityShieldRecordsVo.setMlRes(mlRes);
+            communityShieldRecordsVo.setDlRes(dlRes);
+            communityShieldRecordsVo.setFinalRes(res);
+            communityShieldRecordsVo.setCreateTime();
+            communityShieldRecordsVo.setUpdateTime();
+            recordService.recordCommunityShieldRecord(communityShieldRecordsVo);
+
         }
 
         return messageDao;
