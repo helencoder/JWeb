@@ -79,5 +79,8 @@ function catchInputArea(){
         $("#pos").css("color", "#AAA");
         $("#nor").css("color", "#AAA");
         $("#feedback").css("display", "none");
+        $("#dl-feedback").css("display", "none");
+        $("#ml-feedback").css("display", "none");
+
     }
 }
