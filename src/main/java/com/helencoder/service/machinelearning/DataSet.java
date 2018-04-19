@@ -28,6 +28,7 @@ public class DataSet {
         String dataPath = classPath + "/static/data/classification";
         String posFilePath = dataPath + "/pos.txt";
         String negFilePath = dataPath + "/neg.txt";
+
         JavaRDD<String> posData = sc.textFile(posFilePath);
         JavaRDD<String> negData = sc.textFile(negFilePath);
 

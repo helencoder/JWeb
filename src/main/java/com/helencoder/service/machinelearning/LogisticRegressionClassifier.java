@@ -1,6 +1,7 @@
 package com.helencoder.service.machinelearning;
 
 import com.helencoder.dao.SparkModelDao;
+import com.helencoder.domain.utils.BasicUtil;
 import com.helencoder.domain.utils.WebConstants;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -13,9 +14,8 @@ import org.apache.spark.sql.SparkSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.Serializable;
+import java.io.*;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,11 +33,16 @@ public class LogisticRegressionClassifier implements Serializable {
     @Autowired
     private transient SparkModelDao sparkModelDao;
 
-    public String run(String content) throws FileNotFoundException {
+    public String run(String content) throws IOException {
 
         // 首先进行判断对应模型目录是否存在
         String modelPath = WebConstants.getClassPath() + "/static/model/LogisticRegressionModel";
         File modelFile = new File(modelPath);
+        if (!modelFile.exists()) {
+            InputStream is = this.getClass().getResourceAsStream("/static/data/deep/shield/ShieldModel.net");
+            modelFile = BasicUtil.streamToFile(is);
+        }
+
         // 创建JavaSparkContent
         JavaSparkContext sc = new JavaSparkContext(sparkSession.sparkContext());
         // 创建一个HashingTF实例来把文本映射为包含10000个特征的向量

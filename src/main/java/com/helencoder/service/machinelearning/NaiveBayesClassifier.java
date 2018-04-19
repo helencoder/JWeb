@@ -1,6 +1,7 @@
 package com.helencoder.service.machinelearning;
 
 import com.helencoder.dao.SparkModelDao;
+import com.helencoder.domain.utils.BasicUtil;
 import com.helencoder.domain.utils.WebConstants;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
@@ -37,6 +39,11 @@ public class NaiveBayesClassifier  implements Serializable {
         // 首先进行判断对应模型目录是否存在
         String modelPath = WebConstants.getClassPath() + "/static/model/NaiveBayesModel";
         File modelFile = new File(modelPath);
+        if (!modelFile.exists()) {
+            InputStream is = this.getClass().getResourceAsStream("/static/model/NaiveBayesModel");
+            modelFile = BasicUtil.streamToFile(is);
+        }
+
         // 创建JavaSparkContent
         JavaSparkContext sc = new JavaSparkContext(sparkSession.sparkContext());
         // 创建一个HashingTF实例来把文本映射为包含10000个特征的向量
