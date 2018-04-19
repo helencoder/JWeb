@@ -42,6 +42,7 @@ function goFeedback(){
 
 function goResult(result){
 
+    var details = result.msg.split("\t")
     if(result.code == "100000"){
         if(result.data == "0"){
             $("#pos").css("color", "green");
@@ -51,8 +52,14 @@ function goResult(result){
             $("#nor").css("color", "yellow");
         }
         $("#feedback").text("");
-        $("#feedback").append(result.msg);
+        $("#feedback").append(details[0]);
         $("#feedback").css("display", "inline");
+        $("#ml-feedback").text("");
+        $("#ml-feedback").append(details[1]);
+        $("#ml-feedback").css("display", "inline");
+        $("#dl-feedback").text("");
+        $("#dl-feedback").append(details[2]);
+        $("#dl-feedback").css("display", "inline");
     } else {
         $("#feedback").css("display", "inline");
         console.log(result.msg);
