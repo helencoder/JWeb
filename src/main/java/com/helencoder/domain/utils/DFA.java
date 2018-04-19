@@ -2,10 +2,9 @@ package com.helencoder.domain.utils;
 
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.io.*;
+import java.net.URL;
+import java.util.*;
 
 /**
  * DFA(Deterministic Finite Automaton)算法
@@ -18,9 +17,28 @@ public class DFA {
     private static Map sensitiveWordsMap;
 
     public DFA() {
+
         String dictPath = WebConstants.getClassPath() + "/static/data/sensitiveWords.txt";
+        File dictFile = new File(dictPath);
         sensitiveWordsSet = new HashSet<String>();
-        sensitiveWordsSet.addAll(FileIO.getFileDataByLine(dictPath));
+        if (!dictFile.exists()) {
+//            URL url = getClass().getClassLoader().getResource("/static/data/sensitiveWords.txt");
+//            dictPath = url.getPath().replaceAll("%20", "");
+//            System.out.println("进入类内的路径为：" + dictPath);
+            try {
+                InputStream is = this.getClass().getResourceAsStream("/static/data/sensitiveWords.txt");
+                BufferedReader br = new BufferedReader(new InputStreamReader(is));
+                List<String> sensitiveList = new ArrayList<>();
+                for (String line = br.readLine(); line != null; line = br.readLine()) {
+                    sensitiveList.add(line.trim());
+                }
+                sensitiveWordsSet.addAll(sensitiveList);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        } else {
+            sensitiveWordsSet.addAll(FileIO.getFileDataByLine(dictPath));
+        }
 
         init();
     }

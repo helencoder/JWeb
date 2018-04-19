@@ -10,6 +10,7 @@ import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
 import net.sourceforge.pinyin4j.format.HanyuPinyinVCharType;
 import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
 
+import java.io.*;
 import java.util.*;
 
 /**
@@ -202,6 +203,39 @@ public class BasicUtil {
         }
 
         return output.toString();
+    }
+
+    /**
+     * InputStream转化为File
+     *
+     * @param is
+     * @return File
+     */
+    public static File streamToFile(InputStream is) {
+        File file = new File("");
+        try {
+            OutputStream os = new FileOutputStream(file);
+            int bytesRead = 0;
+            byte[] buffer = new byte[8192];
+            while ((bytesRead = is.read(buffer, 0, 8192)) != -1) {
+                os.write(buffer, 0, bytesRead);
+            }
+            os.close();
+            is.close();
+        } catch (IOException ex) {}
+        return file;
+    }
+
+    /**
+     * 构建jar包获取内部文件方法
+     *
+     * @param filepath 文件处于resources中的路径
+     * @return File
+     */
+    public static File getResourceFile(String filepath) {
+        InputStream cis = BasicUtil.class.getClass().getResourceAsStream("/static/data/deep/shield/categories.txt");
+        File file = BasicUtil.streamToFile(cis);
+        return file;
     }
 
 }

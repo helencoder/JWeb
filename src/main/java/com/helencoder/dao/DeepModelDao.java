@@ -1,13 +1,19 @@
 package com.helencoder.dao;
 
+import com.helencoder.domain.utils.BasicUtil;
 import com.helencoder.domain.utils.WebConstants;
 import com.helencoder.service.deeplearning.Word2VecModel;
+import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.util.ModelSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
+
+import java.io.File;
+import java.io.InputStream;
+import java.net.URL;
 
 /**
  * 加载模型
@@ -37,7 +43,13 @@ public class DeepModelDao {
     public MultiLayerNetwork getNet() throws Exception {
         System.out.println("进入深度模型，执行方法！");
         String modelPath = WebConstants.getClassPath() + "/static/data/deep/emotion/EmotionModel.net";
-        return ModelSerializer.restoreMultiLayerNetwork(modelPath);
+        File modelFile = new File(modelPath);
+        if (!modelFile.exists()) {
+            InputStream is = this.getClass().getResourceAsStream("/static/data/deep/emotion/EmotionModel.net");
+            return ModelSerializer.restoreMultiLayerNetwork(is);
+        } else {
+            return ModelSerializer.restoreMultiLayerNetwork(modelPath);
+        }
     }
 
     /**
@@ -47,7 +59,14 @@ public class DeepModelDao {
     public WordVectors getWordVectors() {
         System.out.println("进入词向量，执行方法！");
         String WORD_VECTORS_PATH = WebConstants.getClassPath() + "/static/data/deep/emotion/dengta.model";
-        return word2VecModel.load(WORD_VECTORS_PATH);
+        File modelFile = new File(WORD_VECTORS_PATH);
+        if (!modelFile.exists()) {
+            InputStream is = this.getClass().getResourceAsStream("/static/data/deep/emotion/dengta.model");
+            modelFile = BasicUtil.streamToFile(is);
+            return WordVectorSerializer.readWord2VecModel(modelFile);
+        } else {
+            return word2VecModel.load(WORD_VECTORS_PATH);
+        }
     }
 
     /**
@@ -57,7 +76,13 @@ public class DeepModelDao {
     public MultiLayerNetwork getShieldNet() throws Exception {
         System.out.println("进入深度模型，执行方法！");
         String modelPath = WebConstants.getClassPath() + "/static/data/deep/shield/ShieldModel.net";
-        return ModelSerializer.restoreMultiLayerNetwork(modelPath);
+        File modelFile = new File(modelPath);
+        if (!modelFile.exists()) {
+            InputStream is = this.getClass().getResourceAsStream("/static/data/deep/shield/ShieldModel.net");
+            return ModelSerializer.restoreMultiLayerNetwork(is);
+        } else {
+            return ModelSerializer.restoreMultiLayerNetwork(modelPath);
+        }
     }
 
     /**
@@ -67,7 +92,14 @@ public class DeepModelDao {
     public WordVectors getShieldWordVectors() {
         System.out.println("进入词向量，执行方法！");
         String WORD_VECTORS_PATH = WebConstants.getClassPath() + "/static/data/deep/shield/shieldWordVector.model";
-        return word2VecModel.load(WORD_VECTORS_PATH);
+        File modelFile = new File(WORD_VECTORS_PATH);
+        if (!modelFile.exists()) {
+            InputStream is = this.getClass().getResourceAsStream("/static/data/deep/shield/shieldWordVector.model");
+            modelFile = BasicUtil.streamToFile(is);
+            return WordVectorSerializer.readWord2VecModel(modelFile);
+        } else {
+            return word2VecModel.load(WORD_VECTORS_PATH);
+        }
     }
 
 }

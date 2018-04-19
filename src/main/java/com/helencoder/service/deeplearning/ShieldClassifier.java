@@ -1,6 +1,7 @@
 package com.helencoder.service.deeplearning;
 
 import com.helencoder.dao.DeepModelDao;
+import com.helencoder.domain.utils.BasicUtil;
 import com.helencoder.domain.utils.WebConstants;
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
@@ -18,6 +19,8 @@ import org.springframework.stereotype.Component;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,9 +44,19 @@ public class ShieldClassifier {
         File classPath = new File(WebConstants.getClassPath());
         String modelPath = classPath + "/static/data/deep/shield/ShieldModel.net";
         File modelFile = new File(modelPath);
+        if (!modelFile.exists()) {
+            InputStream is = this.getClass().getResourceAsStream("/static/data/deep/shield/ShieldModel.net");
+            modelFile = BasicUtil.streamToFile(is);
+        }
+
         WordVectors wordVectors = deepModelDao.getShieldWordVectors();
 
-        String DATA_PATH = classPath + "/static/data/deep/shield";
+        String categoryPath = classPath + "/static/data/deep/shield/categories.txt";
+        File categories = new File(categoryPath);
+        if (!categories.exists()) {
+            InputStream cis = this.getClass().getResourceAsStream("/static/data/deep/shield/categories.txt");
+            categories = BasicUtil.streamToFile(cis);
+        }
 
         tokenizerFactory = new DefaultTokenizerFactory();
         tokenizerFactory.setTokenPreProcessor(new CommonPreprocessor());
@@ -62,7 +75,6 @@ public class ShieldClassifier {
                 INDArray predicted = net.output(fet, false);
                 int arrsiz[] = predicted.shape();
 
-                File categories = new File(DATA_PATH + File.separator + "categories.txt");
 
                 double max = 0;
                 int pos = 0;
